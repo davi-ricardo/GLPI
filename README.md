@@ -86,6 +86,113 @@ Para garantir a segurança dos seus dados, faça cópia das pastas `mysql`, `con
 
 ---
 
+## 🌐 Deploy em VPS (Servidor Remoto)
+
+### 1. Conectar na VPS via SSH
+```bash
+ssh root@seu-ip-vps
+```
+
+### 2. Clonar o Repositório
+```bash
+cd ~
+git clone https://github.com/davi-ricardo/GLPI.git
+mv GLPI /opt/glpi
+cd /opt/glpi
+```
+
+### 3. Criar o Arquivo `.env`
+O arquivo `.env` não é versionado por segurança. Crie-o com:
+```bash
+cat > .env << 'EOF'
+# MariaDB Configuration
+DB_ROOT_PWD=change_me
+GLPI_DB_NAME=glpidb
+GLPI_DB_USER=glpiuser
+GLPI_DB_PASSWORD=change_me
+
+# GLPI Configuration
+GLPI_VERSION=11.0.6
+EOF
+```
+
+### 4. Preparar Diretórios e Rede
+```bash
+docker network create stack_network
+mkdir -p /opt/glpi/glpi-prod/{mysql,config,files,marketplace}
+chmod -R 777 /opt/glpi/glpi-prod/{config,files,marketplace}
+```
+
+### 5. Ajustar a Porta (se necessário)
+Se a porta `8080` já estiver ocupada, altere para outra disponível:
+```bash
+sed -i 's/8080:80/8001:80/g' /opt/glpi/docker-compose.yml
+```
+
+Substitua `8001` pela porta desejada e verificar portas livres com:
+```bash
+sudo netstat -tulpn | grep LISTEN
+```
+
+### 6. Subir os Containers
+```bash
+docker compose up -d
+```
+
+### 7. Acessar o GLPI
+Abra no navegador:
+```
+http://seu-ip-vps:8001
+```
+
+### 8. Configurar o Banco de Dados no Assistente
+Na tela de instalação, preencha:
+- **Servidor SQL**: `glpi-db`
+- **Usuário SQL**: `glpiuser`
+- **Senha SQL**: `change_me` (ou a do seu `.env`)
+- **Banco de Dados**: `glpidb`
+
+### 9. Fazer Login Padrão
+- **Usuário**: `glpi`
+- **Senha**: `glpi`
+
+⚠️ **Importante**: Altere as credenciais padrão imediatamente após o primeiro acesso.
+
+### Comandos Úteis na VPS
+
+**Verificar status dos containers:**
+```bash
+cd /opt/glpi
+docker compose ps
+```
+
+**Ver logs do GLPI:**
+```bash
+docker compose logs glpi -f --tail=100
+```
+
+**Parar o stack:**
+```bash
+docker compose down
+```
+
+**Reiniciar o stack:**
+```bash
+docker compose restart
+```
+
+**Atualizar a versão do GLPI:**
+```bash
+# Altere a versão no .env
+GLPI_VERSION=11.0.7
+
+# Reapply
+docker compose pull
+docker compose up -d
+```
+
+---
+
 ## ❓ Solução de Problemas (Troubleshooting)
 
 ### Erro: "Access denied for user 'glpiuser'"
