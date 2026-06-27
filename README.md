@@ -123,36 +123,25 @@ mkdir -p /opt/glpi/glpi-prod/{mysql,config,files,marketplace}
 chmod -R 777 /opt/glpi/glpi-prod/{config,files,marketplace}
 ```
 
-### 5. Ajustar a Porta (se necessário)
-Se a porta `8080` já estiver ocupada, altere para outra disponível:
-```bash
-sed -i 's/8080:80/8001:80/g' /opt/glpi/docker-compose.yml
-```
-
-Substitua `8001` pela porta desejada e verificar portas livres com:
-```bash
-sudo netstat -tulpn | grep LISTEN
-```
-
-### 6. Subir os Containers
+### 5. Subir os Containers
 ```bash
 docker compose up -d
 ```
 
-### 7. Acessar o GLPI
+### 6. Acessar o GLPI
 Abra no navegador:
 ```
 http://seu-ip-vps:8001
 ```
 
-### 8. Configurar o Banco de Dados no Assistente
+### 7. Configurar o Banco de Dados no Assistente
 Na tela de instalação, preencha:
 - **Servidor SQL**: `glpi-db`
 - **Usuário SQL**: `glpiuser`
 - **Senha SQL**: `change_me` (ou a do seu `.env`)
 - **Banco de Dados**: `glpidb`
 
-### 9. Fazer Login Padrão
+### 8. Fazer Login Padrão
 - **Usuário**: `glpi`
 - **Senha**: `glpi`
 
